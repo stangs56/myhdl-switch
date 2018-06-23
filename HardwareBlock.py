@@ -16,11 +16,13 @@ class HardwareBlock:
     def generateStimulus(self, *args):
         raise NotImplementedError()
 
+    @block
     def createBlock(self):
         if self.signals is None:
             self.signals = self.generateSignals()
 
-        return (self.inst = self.generateBlockFromSignals(self.signals))
+        self.inst = self.generateBlockFromSignals(**self.signals)
+        return self.inst
 
     def generateVHDL(self):
         self.createBlock()
@@ -33,13 +35,13 @@ class HardwareBlock:
     @block
     def testInst(self):
         self.createBlock()
-        self.stimulus = generateStimulus()
+        self.stimulus = self.generateStimulus()
 
         @always(delay(0 if self.clockTime is None else self.clockTime))
         def clkgen():
             self.signals['clk'].next = not self.signals['clk']
 
-        if clockTime is None:
+        if self.clockTime is None:
             return self.inst, self.stimulus
         else:
             return self.inst, clkgen, self.stimulus
