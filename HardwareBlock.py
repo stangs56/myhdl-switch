@@ -7,12 +7,16 @@ class HardwareBlock:
         self.clockTime = clockTime
         self.simLength = simLength
 
+    # replace in concrete class
+    # replace *args with specific arguments
     def generateSignals(self, *args):
         raise NotImplementedError()
 
+    @block
     def generateBlockFromSignals(self, *args):
         raise NotImplementedError()
 
+    @block
     def generateStimulus(self, *args):
         raise NotImplementedError()
 
@@ -30,7 +34,7 @@ class HardwareBlock:
 
     def gerateVerilog(self):
         self.createBlock()
-        self.inst.conver(hdl='Verilog')
+        self.inst.convert(hdl='Verilog')
 
     @block
     def testInst(self):
