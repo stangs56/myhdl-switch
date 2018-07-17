@@ -1,9 +1,11 @@
 language: python
 python:
-  - "nightly"
-  - "3.7-dev"
   - "3.6"
   - "3.5"
+  - "3.4"
+  - "3.3"
+  - "3.2"
+  - "3.1"
 script:
   - python ShiftRegister.py
   - python Encoder4b5b.py
