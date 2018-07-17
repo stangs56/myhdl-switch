@@ -1,3 +1,12 @@
 language: python
+python:
+  - "3.7"
+  - "3.6"
+  - "3.5"
 virtualenv:
   system_site_packages: true
+script:
+  - python ShiftRegister.py
+  - python Encoder4b5b.py
+  - python Decoder4b5b.py
+  - python HardwareBlock.py
