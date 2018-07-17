@@ -32,7 +32,7 @@ class HardwareBlock:
         self.createBlock()
         self.inst.convert(hdl='VHDL')
 
-    def gerateVerilog(self):
+    def generateVerilog(self):
         self.createBlock()
         self.inst.convert(hdl='Verilog')
 
