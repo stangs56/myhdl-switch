@@ -8,6 +8,8 @@ import sys
 
 def test(inst):
     inst.simulate()
+    inst.generateVHDL()
+    inst.generateVerilog()
 
 def main():
     tests = [ShiftRegister.ShiftRegister(),
