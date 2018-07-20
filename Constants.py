@@ -7,9 +7,9 @@ encodingTable4b5b = ['11110', '01001', '10100', '10101',
                 '10010', '10011', '10110', '10111',
                 '11010', '11011', '11100', '11101']
 
-decodingTable4b5b = {encodingTable4b5b[i] : intbv(i) for i in range(2**4)}
+decodingTable4b5b = tuple([(encodingTable4b5b[i] if i in encodingTable4b5b else 0) for i in range(2**5)])
 
-encodingTable4b5b = [intbv(tmp) for tmp in encodingTable4b5b]
+encodingTable4b5b = tuple([int(tmp, 2) for tmp in encodingTable4b5b])
 
 # crc polynomials
 crcPolynomials16bits = {'x25' : (16, 12, 5, 0, ), 'crc-16' : (16, 15, 2, 0,)}

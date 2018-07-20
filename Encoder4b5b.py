@@ -22,7 +22,7 @@ class Encoder4b5b(HardwareBlock):
 
         @always_comb
         def logic():
-            out.next = encodingTable4b5b[input][5:]
+            out.next = encodingTable4b5b[input.val]
 
         return logic
 
