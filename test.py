@@ -1,4 +1,4 @@
-from multiprocessing import Process, JoinableQueue
+from multiprocessing import Process
 
 import ShiftRegister
 import CRCGenerator
