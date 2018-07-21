@@ -1,6 +1,7 @@
 from myhdl import *
 from HardwareBlock import *
 from Constants import crcPolynomials16bits, crcPolynomials32bits
+from copy import copy
 
 class CRCGenerator(HardwareBlock):
     def __init__(self):
@@ -18,13 +19,32 @@ class CRCGenerator(HardwareBlock):
         return self.signals
 
     @block
+    def generateShiftStage(self, clk, tmp, x, useXor):
+        @always(clk.posedge)
+        def withXor():
+            tmp[x].next = tmp[x-1].val ^ tmp[-1].val
+
+        @always(clk.posedge)
+        def withoutXor():
+            tmp[x].next = tmp[x-1].val
+
+        return withXor if useXor else withoutXor
+
+    @block
     def generateBlockFromSignals(self, input, clk, crcValue, go, done, crcType='ethernet'):
         coeffs = crcPolynomials32bits[crcType]
 
         states = enum('WAIT', 'RUNNING', 'OUTPUT')
         curState = Signal(states.WAIT)
 
-        tmp = Signal(intbv(0)[len(crcValue):])
+        tmp = [Signal(intbv(1)[1:]) for _ in range(len(crcValue))]
+        tmp2 = ConcatSignal(*reversed(tmp))
+
+        stages = []
+        print(coeffs)
+
+        for i in range(1, len(tmp)):
+            stages.append(self.generateShiftStage(clk, tmp, i, i in coeffs))
 
         @always(clk.posedge)
         def logic():
@@ -36,10 +56,7 @@ class CRCGenerator(HardwareBlock):
                 else:
                     curState.next = states.WAIT
             elif curState == states.RUNNING:
-                tmp.next[0] = input ^ tmp[len(tmp)-1]
-
-                for i in range(1, len(tmp)):
-                    tmp.next[i] = tmp[i-1] ^ (tmp[len(tmp)-1] if (i in coeffs) else intbv(1)[1:])
+                tmp[0].next = input ^ tmp[-1].val
 
                 if go:
                     curState.next = states.RUNNING
@@ -48,17 +65,18 @@ class CRCGenerator(HardwareBlock):
             elif curState == states.OUTPUT:
                 done.next = True
                 curState.next = states.WAIT
-                crcValue.next = tmp
-                tmp.next = intbv(0)
+                crcValue.next = tmp2 ^ ((2**len(tmp2)) - 1)
+                #tmp[0].next = intbv(0)
 
-        return logic
+        return logic, stages
 
     @block
     def generateStimulus(self):
 
         # testing values from
-        # https://www.scadacore.com/tools/programming-calculators/online-checksum-calculator/
-        tests = [ (int('0x313233343536373839', 16), int('0x04C11DB7', 16)) ]
+        # https://crccalc.com/
+        # http://www.sunshine2k.de/coding/javascript/crc/crc_js.html
+        tests = [ (int('0x313233343536373839', 16), int('0xCBF43926', 16)) ]
 
         @instance
         def stimulus():
@@ -83,7 +101,7 @@ class CRCGenerator(HardwareBlock):
 
                 self.signals['go'].next = False
 
-                yield delay(4)
+                yield delay(6)
 
                 assert(self.signals['done'])
                 assert(self.signals['crcValue'] == testCase[1])
