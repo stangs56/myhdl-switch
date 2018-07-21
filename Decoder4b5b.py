@@ -1,6 +1,6 @@
 from myhdl import *
 from HardwareBlock import *
-from Constants import *
+from Constants import decodingTable4b5b
 
 class Decoder4b5b(HardwareBlock):
     def __init__(self, signals = None):
