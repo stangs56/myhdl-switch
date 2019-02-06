@@ -21,6 +21,7 @@ def test_all():
     # Processes need to be created as myhdl only
     # allows 1 simulation per python instance
     for cur in tests:
+        print(f'\nTesting: {cur}\n')
         p = Process(target=test, args=(cur,))
         p.start()
         p.join()
