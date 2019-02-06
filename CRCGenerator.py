@@ -49,23 +49,25 @@ class CRCGenerator(HardwareBlock):
         @always(clk.posedge)
         def logic():
             done.next = False
+            curState.next = curState.val
 
             if curState == states.WAIT:
                 if go:
                     curState.next = states.RUNNING
-                else:
-                    curState.next = states.WAIT
+
             elif curState == states.RUNNING:
                 tmp[0].next = input ^ tmp[-1].val
 
-                if go:
-                    curState.next = states.RUNNING
-                else:
+                if not go:
                     curState.next = states.OUTPUT
+
             elif curState == states.OUTPUT:
                 done.next = True
-                curState.next = states.WAIT
                 crcValue.next = tmp2 ^ ((2**len(tmp2)) - 1)
+
+                if not go:
+                    curState.next = states.WAIT
+
                 #tmp[0].next = intbv(0)
 
         return logic, stages
