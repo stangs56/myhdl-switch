@@ -6,6 +6,7 @@ class HardwareBlock:
         self.signals = signals
         self.clockTime = clockTime
         self.simLength = simLength
+        self.inst = None
 
     # replace in concrete class
     # replace *args with specific arguments
@@ -21,11 +22,16 @@ class HardwareBlock:
         raise NotImplementedError()
 
     @block
-    def createBlock(self):
-        if self.signals is None:
-            self.signals = self.generateSignals()
+    def createBlock(self, signals = None):
+        if self.inst is None:
+            if self.signals is None:
+                if signals is None:
+                    self.signals = self.generateSignals()
+                else:
+                    self.signals = signals
 
-        self.inst = self.generateBlockFromSignals(**self.signals)
+            self.inst = self.generateBlockFromSignals(**self.signals)
+
         return self.inst
 
     def generateVHDL(self):
