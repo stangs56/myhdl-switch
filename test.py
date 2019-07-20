@@ -44,7 +44,7 @@ def main():
         #gets full current working directory
         cur = Path().resolve()
 
-        extensions = ['*.v', '*.vhd', '*.vcd']
+        extensions = ['*.v', '*.vhd', '*.vcd', '*.log']
 
         for ext in extensions:
             files = cur.rglob(ext)
